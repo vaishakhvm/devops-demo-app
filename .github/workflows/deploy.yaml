@@ -29,7 +29,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Use the token in the URL so the runner can push changes
-          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/vaishakhvm/devops-demo-gitops.git
+          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/vaishakhvm/devops-demo-gitops.git
           cd devops-demo-gitops
           
           # Update the tag in values.yaml
