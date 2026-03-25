@@ -25,17 +25,14 @@ jobs:
 
       - name: Update GitOps repo
         run: |
-          # Use the token in the URL so the runner can push changes
           git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/vaishakhvm/devops-demo-gitops.git
           cd devops-demo-gitops
-          
-          # Update the tag in values.yaml
-          # Note: Adjusted path to match standard Helm structure
+
           sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" devops-demo/values.yaml
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add devops-demo/values.yaml
-          git commit -m "Update image tag to ${{ github.sha }} [skip ci]"
+          git commit -m "Update image tag to ${{ github.sha }} [skip ci]" || echo "No changes"
           git push
