@@ -24,9 +24,6 @@ jobs:
         run: docker push ${{ secrets.DOCKER_USERNAME }}/devops-demo:${{ github.sha }}
 
       - name: Update GitOps repo
-        env:
-          # This token is automatically provided by GitHub Actions
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Use the token in the URL so the runner can push changes
           git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/vaishakhvm/devops-demo-gitops.git
