@@ -14,10 +14,31 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/devops-demo:${{ github.sha }} .
 
       - name: Push image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/devops-demo:${{ github.sha }}
+
+      - name: Update GitOps repo
+        env:
+          # This token is automatically provided by GitHub Actions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Use the token in the URL so the runner can push changes
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/vaishakhvm/devops-demo-gitops.git
+          cd devops-demo-gitops
+          
+          # Update the tag in values.yaml
+          # Note: Adjusted path to match standard Helm structure
+          sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" devops-demo/values.yaml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add devops-demo/values.yaml
+          git commit -m "Update image tag to ${{ github.sha }} [skip ci]"
+          git push
